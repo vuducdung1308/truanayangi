@@ -183,14 +183,10 @@ html{scrollbar-gutter:stable}.reel-window{overflow:clip}.reel-track{transform:tr
 .reel-track .case-tile-card .card-copy strong{font-size:12px;font-weight:700;letter-spacing:2px;color:#dbe7ab;text-shadow:0 0 10px #d2f65b55}
 @media(prefers-reduced-motion:reduce){.case-shine{display:none}}
 
-/* Two spin purposes: everyday lunch vs shared feast for a group of ~10. */
+/* Two spin purposes: everyday lunch vs a nicer Friday sit-down lunch. */
 .mode-tabs{display:flex;gap:8px;justify-content:center;margin:0 0 4px}
 .mode-tab{padding:9px 18px;font-size:13px;font-weight:600;letter-spacing:.3px;color:#aeb6bd;background:#1c2831b0;border:1px solid #ffffff24;transition:background .15s,color .15s,border-color .15s}
 .mode-tab:hover:not(:disabled){color:#e7ecef;border-color:#ffffff40}
 .mode-tab.active{color:#16210b;background:#d2f65b;border-color:#e7ffa6;font-weight:800}
 .mode-tab:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:640px){.mode-tabs{flex-wrap:wrap}.mode-tab{flex:1 1 40%;padding:9px 10px}}
-
-/* Feast dishes: platter placeholder until the food-feast-* atlas exists. */
-.feast-placeholder{display:grid;place-items:center;aspect-ratio:1;mix-blend-mode:normal;background:radial-gradient(ellipse at 50% 62%,color-mix(in srgb,var(--rarity,#4b69ff),transparent 80%),#181c22 78%)}
-.feast-placeholder svg{width:78%;height:78%;filter:drop-shadow(0 6px 14px #0007)}

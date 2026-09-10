@@ -1,7 +1,7 @@
 'use client';
 import { createSpinProfile, spinProgress, createFoodSelector, stopFraction } from '@/lib/case-mechanics';
 import { foods, type Food } from '@/lib/foods';
-import { feastFoods } from '@/lib/feast-foods';
+import { fridayFoods } from '@/lib/friday-foods';
 import { useGlobalSpinCount } from '@/hooks/use-global-spin-count';
 import { CaseAudio } from '@/lib/case-audio';
 import { flushSync } from 'react-dom';
@@ -17,25 +17,24 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const SEARCH_ANCHOR_LABEL = '52 Lê Đại Hành, Hai Bà Trưng, Hà Nội';
 const SEARCH_ANCHOR_LATLNG = '21.0169,105.8456';
 const SEARCH_ANCHOR_ZOOM = '16z';
-function findNearbyUrl(dish: string, feast = false) {
- const phrase = feast
-  ? `nhà hàng ${dish} đặt bàn nhóm phòng riêng gần ${SEARCH_ANCHOR_LABEL}`
-  : `${dish} gần ${SEARCH_ANCHOR_LABEL}`;
+function findNearbyUrl(subject: string) {
+ const phrase = `${subject} gần ${SEARCH_ANCHOR_LABEL}`;
  return `https://www.google.com/maps/search/${encodeURIComponent(phrase)}/@${SEARCH_ANCHOR_LATLNG},${SEARCH_ANCHOR_ZOOM}`;
 }
 
-// Two spin purposes. Everyday single-serve lunch, and a shared feast for a group
-// of ~10 (higher per-head budget, party dishes from lib/feast-foods).
+// Two spin purposes. Everyday single-serve lunch, and a nicer Friday sit-down
+// lunch (200k-400k / người) at real restaurants near 52 Lê Đại Hành — see
+// lib/friday-foods.
 const modes = {
  lunch: {
   title: 'Mở hòm ăn trưa', tab: 'Ăn trưa',
   budgetLabel: 'Mức chi thường ngày', unit: 'nghìn / bữa', meanUnit: 'bữa',
   presets: ['35', '50', '75', '100', '150'], fallback: 50, min: 30, max: 180,
  },
- feast: {
-  title: 'Mở hòm liên hoan nhóm', tab: 'Liên hoan nhóm 10',
+ friday: {
+  title: 'Mở hòm ăn trưa thứ 6', tab: 'Ăn trưa thứ 6',
   budgetLabel: 'Mức chi mỗi người', unit: 'nghìn / người', meanUnit: 'người',
-  presets: ['150', '200', '250', '300'], fallback: 200, min: 90, max: 460,
+  presets: ['200', '250', '300', '350', '400'], fallback: 300, min: 200, max: 400,
  },
 } as const;
 type Mode = keyof typeof modes;
@@ -43,18 +42,7 @@ type Mode = keyof typeof modes;
 
 const tiers=['QUỐC DÂN','HIẾM','CỰC PHẨM','TỐI MẬT','★ ĐẶC BIỆT'];
 const colors=['#4b69ff','#8847ff','#d32ce6','#eb4b4b','#e4ae39'];
-function FeastPlaceholder({food}:{food:Food}){return <div className="food-image feast-placeholder" role="img" aria-label={food.name}>
- <svg viewBox="0 0 120 100" aria-hidden="true">
-  <ellipse cx="60" cy="82" rx="42" ry="8" fill="#0006"/>
-  <path d="M18 78a42 42 0 0 1 84 0Z" fill="#2b3540" stroke="#ffffff33" strokeWidth="2"/>
-  <path d="M18 78a42 42 0 0 1 84 0" fill="none" stroke="#d2f65b" strokeWidth="2" opacity=".55"/>
-  <rect x="14" y="76" width="92" height="8" rx="4" fill="#39434f" stroke="#ffffff2e"/>
-  <circle cx="60" cy="34" r="5" fill="#d2f65b"/>
-  <path d="M50 30c-4-6 2-10-2-15M60 26c-4-6 2-10-2-15M70 30c-4-6 2-10-2-15" fill="none" stroke="#d2f65b" strokeWidth="2" opacity=".5" strokeLinecap="round"/>
- </svg>
-</div>}
 function FoodImage({food}:{food:Food}){
- if(food.image>=200)return <FeastPlaceholder food={food}/>;
  const common=food.image>=120,lunch=food.image>=72&&!common,expanded=food.image>=36;
  const index=common?(food.image-120)%12:lunch?(food.image-72)%12:expanded?(food.image-36)%12:food.image%4;
  const atlas=common?`food-common-${Math.floor((food.image-120)/12)}`:lunch?`food-lunch-${Math.floor((food.image-72)/12)}`:expanded?`food-expanded-${Math.floor((food.image-36)/12)}`:`food-hd-${Math.floor(food.image/4)}`;
@@ -88,18 +76,18 @@ function CaseTile(){return <div className="case-tile" role="img" aria-label="Hò
  </svg>
  <span className="case-shine" aria-hidden="true"/>
 </div>}
-const Card=memo(function Card({food,small=false,slot,box=false}:{food:Food;small?:boolean;slot?:number;box?:boolean}){const mystery=!small&&!box&&food.rarity===4;return <div className={`food-card ${small?'small':''} ${mystery?'mystery-card':''} ${box?'case-tile-card':''}`} data-slot-id={slot} data-food-id={food.image} style={{'--rarity':colors[food.rarity],...(slot===undefined?{}:{position:'absolute',left:slot*254})} as React.CSSProperties}><span className="tier">{tiers[food.rarity]}</span>{box?<CaseTile/>:mystery?<MysteryArt/>:<FoodImage food={food}/>}<div className="card-copy"><strong>{box?'HÒM BÍ ẨN':mystery?'★ MÓN BÍ ẨN':food.name}</strong><span>{small?`~${food.price}.000đ`:food.sub}</span></div></div>});
+const Card=memo(function Card({food,small=false,slot,box=false,showVenue=false}:{food:Food;small?:boolean;slot?:number;box?:boolean;showVenue?:boolean}){const mystery=!small&&!box&&food.rarity===4;return <div className={`food-card ${small?'small':''} ${mystery?'mystery-card':''} ${box?'case-tile-card':''}`} data-slot-id={slot} data-food-id={food.image} style={{'--rarity':colors[food.rarity],...(slot===undefined?{}:{position:'absolute',left:slot*254})} as React.CSSProperties}><span className="tier">{tiers[food.rarity]}</span>{box?<CaseTile/>:mystery?<MysteryArt/>:<FoodImage food={food}/>}<div className="card-copy"><strong>{box?'HÒM BÍ ẨN':mystery?'★ MÓN BÍ ẨN':food.name}</strong><span>{showVenue?food.sub:small?`~${food.price}.000đ`:food.sub}</span></div></div>});
 
 export default function Home(){
  const {count:globalSpins,enabled:counterEnabled,recordSpin}=useGlobalSpinCount();
  const [githubStars,setGithubStars]=useState<number|null>(null);
  const [mode,setMode]=useState<Mode>('lunch');
  const cfg=modes[mode];
- const pool=mode==='feast'?feastFoods:foods;
+ const pool=mode==='friday'?fridayFoods:foods;
  const [budget,setBudget]=useState('50'),[custom,setCustom]=useState('50'),[veg,setVeg]=useState(false),[sound,setSound]=useState(true),[spinning,setSpinning]=useState(false),[result,setResult]=useState<Food|null>(null),[revealed,setRevealed]=useState(false);
  const [reel,setReel]=useState(()=>foods.slice(0,12).map((food,id)=>({food,id}))),[moving,setMoving]=useState(false);
  const busy=useRef(false),viewport=useRef<HTMLDivElement>(null);
- useEffect(()=>{const context=(document as Document & {modelContext?:{registerTool:(tool:unknown,options:unknown)=>void}}).modelContext;if(!context)return;const lifecycle=new AbortController();const expose=(list:Food[])=>list.map(({name,price,veg})=>({name,approximatePriceVND:price*1000,vegetarian:!!veg}));try{context.registerTool({name:'list_lunch_items',description:'Read all everyday single-serve lunch options with approximate per-person prices and vegetarian status.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:(input:unknown)=>{if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return expose(foods)}},{signal:lifecycle.signal});context.registerTool({name:'list_feast_items',description:'Read all shared party dishes for a group of about 10, with approximate per-person feast prices and vegetarian status.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:(input:unknown)=>{if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return expose(feastFoods)}},{signal:lifecycle.signal})}catch{}return ()=>lifecycle.abort()},[]);
+ useEffect(()=>{const context=(document as Document & {modelContext?:{registerTool:(tool:unknown,options:unknown)=>void}}).modelContext;if(!context)return;const lifecycle=new AbortController();const expose=(list:Food[])=>list.map(({name,price,veg})=>({name,approximatePriceVND:price*1000,vegetarian:!!veg}));try{context.registerTool({name:'list_lunch_items',description:'Read all everyday single-serve lunch options with approximate per-person prices and vegetarian status.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:(input:unknown)=>{if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return expose(foods)}},{signal:lifecycle.signal});context.registerTool({name:'list_friday_lunch_items',description:'Read the nicer Friday sit-down lunch options (200k-400k per person) at restaurants near 52 Lê Đại Hành, with the venue, approximate per-person price and vegetarian status.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:(input:unknown)=>{if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return fridayFoods.map(({name,sub,price,veg})=>({name,venue:sub,approximatePriceVND:price*1000,vegetarian:!!veg}))}},{signal:lifecycle.signal})}catch{}return ()=>lifecycle.abort()},[]);
  useEffect(()=>{let live=true;const key='truanayangi-github-stars';try{const cached=JSON.parse(localStorage.getItem(key)||'null');if(cached&&Number.isInteger(cached.count)&&Date.now()-cached.savedAt<900_000){setGithubStars(cached.count);return}}catch{}fetch('https://api.github.com/repos/vuducdung1308/truanayangi').then(response=>response.ok?response.json():Promise.reject()).then((data:unknown)=>{if(!data||typeof data!=='object'||!('stargazers_count' in data)||!Number.isInteger(data.stargazers_count))return;const count=data.stargazers_count as number;if(!live)return;setGithubStars(count);try{localStorage.setItem(key,JSON.stringify({count,savedAt:Date.now()}))}catch{}}).catch(()=>{});return()=>{live=false}},[]);
  const target=budget==='custom'?Number(custom):Number(budget);
  const validTarget=Number.isInteger(target)&&target>=cfg.min&&target<=cfg.max;
@@ -119,7 +107,7 @@ export default function Home(){
   return ()=>{document.removeEventListener('visibilitychange',hide);engine.dispose();audio.current=null};
  },[]);
  const [visibleStart,setVisibleStart]=useState(0);
- const inventoryCards=useMemo(()=>[...eligible].sort((a,b)=>a.rarity-b.rarity||a.price-b.price||a.name.localeCompare(b.name,'vi')).map(f=><Card food={f} small key={f.name}/>),[eligible]);
+ const inventoryCards=useMemo(()=>[...eligible].sort((a,b)=>a.rarity-b.rarity||a.price-b.price||a.name.localeCompare(b.name,'vi')).map(f=><Card food={f} small showVenue={mode==='friday'} key={f.name}/>),[eligible,mode]);
 
  const track=useRef<HTMLDivElement>(null);
  const position=useRef(-400);
@@ -132,7 +120,7 @@ export default function Home(){
   const fallback=String(modes[next].fallback);
   setBudget(fallback);setCustom(fallback);
   setResult(null);setRevealed(false);
-  setReel((next==='feast'?feastFoods:foods).slice(0,12).map((food,id)=>({food,id})));
+  setReel((next==='friday'?fridayFoods:foods).slice(0,12).map((food,id)=>({food,id})));
   setVisibleStart(0);
   position.current=-400;
   if(track.current)track.current.style.transform='translate3d(-400px,0,0)';
@@ -195,7 +183,7 @@ export default function Home(){
  <section className="case-panel" aria-label="Mở hòm món ăn">
  <div className={`reel-window ${moving?'is-spinning':''} `} ref={viewport}><div className="selector-line"/><div className="reel-track" ref={track}>{reel.filter(({id})=>id>=visibleStart&&id<visibleStart+12).map(({food,id})=><Card key={id} food={food} slot={id} box/>)}</div><div className="reel-fade left"/><div className="reel-fade right"/></div></section>
  <div className="control-bar"><div className="filters"><div className="budget"><label id="budget-label">{cfg.budgetLabel}</label><Select value={budget} onValueChange={v=>setBudget(v??String(cfg.fallback))} disabled={spinning}><SelectTrigger aria-labelledby="budget-label"><SelectValue>{budget==='custom'?'Tuỳ chỉnh':`${budget}.000đ`}</SelectValue></SelectTrigger><SelectContent>{cfg.presets.map(v=><SelectItem key={v} value={v}>{v}.000đ</SelectItem>)}<SelectItem value="custom">Tuỳ chỉnh</SelectItem></SelectContent></Select>{budget==='custom'&&<div className="custom-spend"><input aria-label="Mức chi tuỳ chỉnh (nghìn đồng)" aria-invalid={!validTarget} type="number" inputMode="numeric" min={cfg.min} max={cfg.max} step="1" value={custom} disabled={spinning} onChange={e=>setCustom(e.target.value)}/><span>{cfg.unit}</span></div>}{!validTarget&&<small className="spend-note" role="alert">Nhập từ {cfg.min} đến {cfg.max} nghìn.</small>}{veg&&validTarget&&<small className="spend-note">Pool chay: trung bình ~{Math.round(filteredMean)}.000đ / {cfg.meanUnit}</small>}</div><label className="veg"><Switch checked={veg} onCheckedChange={setVeg} disabled={spinning} aria-label="Chỉ ăn chay"/><span><Leaf size={15}/> Ăn chay</span></label></div><div className="open-wrap"><button className="open-button" disabled={spinning||!validTarget||!eligible.length} onClick={open}>{spinning?<AudioLines size={22}/>:<Sparkles size={21}/>} {spinning?'ĐANG MỞ HÒM…':result?'MỞ LẠI':'MỞ HÒM'} <span>↗</span></button></div></div>
- <Dialog open={revealed} onOpenChange={setRevealed}><DialogContent className="winner-dialog" showCloseButton={false}>{result&&<><span className="winner-label">VẬT PHẨM MỚI</span><DialogTitle className="winner-title">{result.name}</DialogTitle><DialogDescription className="winner-description">Giá tham khảo · ~{result.price}.000đ / người{result.image>=200?' · nhóm ~10':''}</DialogDescription><div className="winner-art" style={{'--rarity':colors[result.rarity]} as React.CSSProperties}><FoodImage food={result}/></div><div className="winner-actions"><a className="find-button" href={findNearbyUrl(result.name,result.image>=200)} target="_blank" rel="noreferrer">TÌM QUÁN <ArrowUpRight size={16}/></a><button onClick={()=>setRevealed(false)}>TIẾP TỤC</button></div></>}</DialogContent></Dialog>
+ <Dialog open={revealed} onOpenChange={setRevealed}><DialogContent className="winner-dialog" showCloseButton={false}>{result&&<><span className="winner-label">VẬT PHẨM MỚI</span><DialogTitle className="winner-title">{result.name}</DialogTitle><DialogDescription className="winner-description">{mode==='friday'?`${result.sub} · `:'Giá tham khảo · '}~{result.price}.000đ / người</DialogDescription><div className="winner-art" style={{'--rarity':colors[result.rarity]} as React.CSSProperties}><FoodImage food={result}/></div><div className="winner-actions"><a className="find-button" href={findNearbyUrl(mode==='friday'?`${result.name} ${result.sub.replace(/\s*•\s*/g,' ')}`:result.name)} target="_blank" rel="noreferrer">TÌM QUÁN <ArrowUpRight size={16}/></a><button onClick={()=>setRevealed(false)}>TIẾP TỤC</button></div></>}</DialogContent></Dialog>
 
  <section className="inventory"><div className="section-heading"><div><span className="eyebrow">TRONG HÒM CÓ GÌ?</span><h2>Vật phẩm trong hòm <span>{eligible.length.toString().padStart(2,'0')}</span></h2></div><div className="rarity-legend">{tiers.map((t,i)=><span key={t}><i style={{background:colors[i]}}/>{t}</span>)}</div></div><div className="inventory-grid">{inventoryCards}</div></section>
 
