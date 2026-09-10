@@ -190,3 +190,6 @@ html{scrollbar-gutter:stable}.reel-window{overflow:clip}.reel-track{transform:tr
 .mode-tab.active{color:#16210b;background:#d2f65b;border-color:#e7ffa6;font-weight:800}
 .mode-tab:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:640px){.mode-tabs{flex-wrap:wrap}.mode-tab{flex:1 1 40%;padding:9px 10px}}
+
+/* "You picked this before" note in the result dialog (local per-browser history). */
+.winner-history{margin:8px 0 0;font-size:13px;line-height:1.5;color:#d8c07a;text-align:center;font-variant-numeric:tabular-nums;max-width:min(520px,86vw)}

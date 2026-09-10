@@ -2,6 +2,7 @@
 import { createSpinProfile, spinProgress, createFoodSelector, stopFraction } from '@/lib/case-mechanics';
 import { foods, type Food } from '@/lib/foods';
 import { fridayFoods } from '@/lib/friday-foods';
+import { appendSpin, readSpinHistory, pickedDays } from '@/lib/spin-history';
 import { useGlobalSpinCount } from '@/hooks/use-global-spin-count';
 import { CaseAudio } from '@/lib/case-audio';
 import { flushSync } from 'react-dom';
@@ -85,6 +86,7 @@ export default function Home(){
  const cfg=modes[mode];
  const pool=mode==='friday'?fridayFoods:foods;
  const [budget,setBudget]=useState('50'),[custom,setCustom]=useState('50'),[veg,setVeg]=useState(false),[sound,setSound]=useState(true),[spinning,setSpinning]=useState(false),[result,setResult]=useState<Food|null>(null),[revealed,setRevealed]=useState(false);
+ const [priorDays,setPriorDays]=useState<string[]>([]);
  const [reel,setReel]=useState(()=>foods.slice(0,12).map((food,id)=>({food,id}))),[moving,setMoving]=useState(false);
  const busy=useRef(false),viewport=useRef<HTMLDivElement>(null);
  useEffect(()=>{const context=(document as Document & {modelContext?:{registerTool:(tool:unknown,options:unknown)=>void}}).modelContext;if(!context)return;const lifecycle=new AbortController();const expose=(list:Food[])=>list.map(({name,price,veg})=>({name,approximatePriceVND:price*1000,vegetarian:!!veg}));try{context.registerTool({name:'list_lunch_items',description:'Read all everyday single-serve lunch options with approximate per-person prices and vegetarian status.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:(input:unknown)=>{if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return expose(foods)}},{signal:lifecycle.signal});context.registerTool({name:'list_friday_lunch_items',description:'Read the nicer Friday sit-down lunch options (200k-400k per person) at restaurants near 52 Lê Đại Hành, with the venue, approximate per-person price and vegetarian status.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:(input:unknown)=>{if(!input||typeof input!=='object'||Object.keys(input).length)throw new Error('Expected an empty object');return fridayFoods.map(({name,sub,price,veg})=>({name,venue:sub,approximatePriceVND:price*1000,vegetarian:!!veg}))}},{signal:lifecycle.signal})}catch{}return ()=>lifecycle.abort()},[]);
@@ -119,7 +121,7 @@ export default function Home(){
   setMode(next);
   const fallback=String(modes[next].fallback);
   setBudget(fallback);setCustom(fallback);
-  setResult(null);setRevealed(false);
+  setResult(null);setRevealed(false);setPriorDays([]);
   setReel((next==='friday'?fridayFoods:foods).slice(0,12).map((food,id)=>({food,id})));
   setVisibleStart(0);
   position.current=-400;
@@ -148,7 +150,7 @@ export default function Home(){
    const food=id===target?winner:selector.choose(alternatives.length?alternatives:eligible);
    items.push({id,food});recent.push(food);if(recent.length>8)recent.shift();
   }
-  flushSync(()=>{setReel(items);setSpinning(true);setMoving(true);setResult(null)});
+  flushSync(()=>{setReel(items);setSpinning(true);setMoving(true);setResult(null);setPriorDays([])});
   audio.current?.play('csgo_ui_crate_open');
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const duration=reduced?150:profile.durationMs;
@@ -169,6 +171,8 @@ export default function Home(){
    if(cell!==lastCell){audio.current?.play('csgo_ui_crate_item_scroll');lastCell=cell}
    if(progress<1){frame.current=requestAnimationFrame(animate);return}
    void recordSpin(spinId);
+   setPriorDays(pickedDays(readSpinHistory(),winner.name));
+   appendSpin({name:winner.name,mode,at:Date.now()});
    busy.current=false;setSpinning(false);setMoving(false);setResult(winner);setRevealed(true);
    audio.current?.play((['item_reveal3_rare','item_reveal4_mythical','item_reveal5_legendary','item_reveal6_ancient','item_reveal6_ancient'] as const)[winner.rarity]);
   };
@@ -183,7 +187,7 @@ export default function Home(){
  <section className="case-panel" aria-label="Mở hòm món ăn">
  <div className={`reel-window ${moving?'is-spinning':''} `} ref={viewport}><div className="selector-line"/><div className="reel-track" ref={track}>{reel.filter(({id})=>id>=visibleStart&&id<visibleStart+12).map(({food,id})=><Card key={id} food={food} slot={id} box/>)}</div><div className="reel-fade left"/><div className="reel-fade right"/></div></section>
  <div className="control-bar"><div className="filters"><div className="budget"><label id="budget-label">{cfg.budgetLabel}</label><Select value={budget} onValueChange={v=>setBudget(v??String(cfg.fallback))} disabled={spinning}><SelectTrigger aria-labelledby="budget-label"><SelectValue>{budget==='custom'?'Tuỳ chỉnh':`${budget}.000đ`}</SelectValue></SelectTrigger><SelectContent>{cfg.presets.map(v=><SelectItem key={v} value={v}>{v}.000đ</SelectItem>)}<SelectItem value="custom">Tuỳ chỉnh</SelectItem></SelectContent></Select>{budget==='custom'&&<div className="custom-spend"><input aria-label="Mức chi tuỳ chỉnh (nghìn đồng)" aria-invalid={!validTarget} type="number" inputMode="numeric" min={cfg.min} max={cfg.max} step="1" value={custom} disabled={spinning} onChange={e=>setCustom(e.target.value)}/><span>{cfg.unit}</span></div>}{!validTarget&&<small className="spend-note" role="alert">Nhập từ {cfg.min} đến {cfg.max} nghìn.</small>}{veg&&validTarget&&<small className="spend-note">Pool chay: trung bình ~{Math.round(filteredMean)}.000đ / {cfg.meanUnit}</small>}</div><label className="veg"><Switch checked={veg} onCheckedChange={setVeg} disabled={spinning} aria-label="Chỉ ăn chay"/><span><Leaf size={15}/> Ăn chay</span></label></div><div className="open-wrap"><button className="open-button" disabled={spinning||!validTarget||!eligible.length} onClick={open}>{spinning?<AudioLines size={22}/>:<Sparkles size={21}/>} {spinning?'ĐANG MỞ HÒM…':result?'MỞ LẠI':'MỞ HÒM'} <span>↗</span></button></div></div>
- <Dialog open={revealed} onOpenChange={setRevealed}><DialogContent className="winner-dialog" showCloseButton={false}>{result&&<><span className="winner-label">VẬT PHẨM MỚI</span><DialogTitle className="winner-title">{result.name}</DialogTitle><DialogDescription className="winner-description">{mode==='friday'?`${result.sub} · `:'Giá tham khảo · '}~{result.price}.000đ / người</DialogDescription><div className="winner-art" style={{'--rarity':colors[result.rarity]} as React.CSSProperties}><FoodImage food={result}/></div><div className="winner-actions"><a className="find-button" href={findNearbyUrl(mode==='friday'?`${result.name} ${result.sub.replace(/\s*•\s*/g,' ')}`:result.name)} target="_blank" rel="noreferrer">TÌM QUÁN <ArrowUpRight size={16}/></a><button onClick={()=>setRevealed(false)}>TIẾP TỤC</button></div></>}</DialogContent></Dialog>
+ <Dialog open={revealed} onOpenChange={setRevealed}><DialogContent className="winner-dialog" showCloseButton={false}>{result&&<><span className="winner-label">VẬT PHẨM MỚI</span><DialogTitle className="winner-title">{result.name}</DialogTitle><DialogDescription className="winner-description">{mode==='friday'?`${result.sub} · `:'Giá tham khảo · '}~{result.price}.000đ / người</DialogDescription>{priorDays.length>0&&<p className="winner-history">🗓️ Đã chọn món này {priorDays.length===1?`ngày ${priorDays[0]}`:`vào ${priorDays.length} ngày: ${priorDays.slice(-4).join(' · ')}`}{priorDays.length>4?` (+${priorDays.length-4})`:''}</p>}<div className="winner-art" style={{'--rarity':colors[result.rarity]} as React.CSSProperties}><FoodImage food={result}/></div><div className="winner-actions"><a className="find-button" href={findNearbyUrl(mode==='friday'?`${result.name} ${result.sub.replace(/\s*•\s*/g,' ')}`:result.name)} target="_blank" rel="noreferrer">TÌM QUÁN <ArrowUpRight size={16}/></a><button onClick={()=>setRevealed(false)}>TIẾP TỤC</button></div></>}</DialogContent></Dialog>
 
  <section className="inventory"><div className="section-heading"><div><span className="eyebrow">TRONG HÒM CÓ GÌ?</span><h2>Vật phẩm trong hòm <span>{eligible.length.toString().padStart(2,'0')}</span></h2></div><div className="rarity-legend">{tiers.map((t,i)=><span key={t}><i style={{background:colors[i]}}/>{t}</span>)}</div></div><div className="inventory-grid">{inventoryCards}</div></section>
 
