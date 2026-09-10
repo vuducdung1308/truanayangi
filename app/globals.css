@@ -172,3 +172,25 @@ html{scrollbar-gutter:stable}.reel-window{overflow:clip}.reel-track{transform:tr
 .custom-spend{display:flex;align-items:center;gap:8px;margin-top:8px;color:#bfc5cc;font-size:12px}.custom-spend input{width:90px;min-height:40px;background:#25333d;border:1px solid #ffffff35;color:white;padding:8px;font-size:16px}.spend-note{display:block;margin-top:8px;color:#c2cbd2;font-size:12px;max-width:235px}.custom-spend input[aria-invalid=true]{border-color:#eb8f84}
 
 .header-actions{display:flex;align-items:center;gap:8px}.github-button{height:36px;display:flex;align-items:center;gap:8px;padding:0 10px;color:#d8dde1;text-decoration:none;border:1px solid #ffffff2b;background:#1d2932b8;font-size:13px}.github-button:hover{background:#2b3a45;border-color:#ffffff4a}.github-mark{width:18px;height:18px;flex:none}.github-stars{height:20px;display:flex;align-items:center;gap:4px;padding-left:8px;border-left:1px solid #ffffff28;color:#dec989;font-variant-numeric:tabular-nums}.github-stars svg{flex:none}@media(max-width:640px){.header-actions{gap:2px}.github-button{padding:0 8px;border:0;background:none}.github-label{display:none}.github-stars{padding-left:6px}.sound-button{padding:10px 8px}}
+
+/* Reel shows sealed cases only; the meal is revealed in the result dialog. */
+.case-tile{position:relative;width:150px;height:150px;margin:0 auto;overflow:hidden}
+.case-tile svg{width:100%;height:100%;display:block;filter:drop-shadow(0 5px 12px #0007)}
+.case-tile .crate-glow{fill:#d2f65b12;stroke:#d2f65b3d;stroke-width:2}
+.case-shine{position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 42%,#ffffff26 48%,#eaffa6a6 50%,#ffffff26 52%,transparent 58%);transform:translateX(-120%);animation:case-shine 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes case-shine{0%,24%{transform:translateX(-120%)}60%,100%{transform:translateX(120%)}}
+.reel-track .case-tile-card .card-copy{background:linear-gradient(transparent,#16212ae0 40%)}
+.reel-track .case-tile-card .card-copy strong{font-size:12px;font-weight:700;letter-spacing:2px;color:#dbe7ab;text-shadow:0 0 10px #d2f65b55}
+@media(prefers-reduced-motion:reduce){.case-shine{display:none}}
+
+/* Two spin purposes: everyday lunch vs shared feast for a group of ~10. */
+.mode-tabs{display:flex;gap:8px;justify-content:center;margin:0 0 4px}
+.mode-tab{padding:9px 18px;font-size:13px;font-weight:600;letter-spacing:.3px;color:#aeb6bd;background:#1c2831b0;border:1px solid #ffffff24;transition:background .15s,color .15s,border-color .15s}
+.mode-tab:hover:not(:disabled){color:#e7ecef;border-color:#ffffff40}
+.mode-tab.active{color:#16210b;background:#d2f65b;border-color:#e7ffa6;font-weight:800}
+.mode-tab:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:640px){.mode-tabs{flex-wrap:wrap}.mode-tab{flex:1 1 40%;padding:9px 10px}}
+
+/* Feast dishes: platter placeholder until the food-feast-* atlas exists. */
+.feast-placeholder{display:grid;place-items:center;aspect-ratio:1;mix-blend-mode:normal;background:radial-gradient(ellipse at 50% 62%,color-mix(in srgb,var(--rarity,#4b69ff),transparent 80%),#181c22 78%)}
+.feast-placeholder svg{width:78%;height:78%;filter:drop-shadow(0 6px 14px #0007)}
