@@ -12,7 +12,8 @@
       "binding": "DB",
       "database_name": "truanayangi-counter",
       "migrations_dir": "migrations",
-      "database_id": "8965f415-cff2-4398-9e63-70fcc7bb7faf"
+      // Replace with the id printed by: npx wrangler d1 create truanayangi-counter
+      "database_id": ""
     }
   ],
   "ratelimits": [
@@ -26,7 +27,7 @@
     }
   ],
   "vars": {
-    "ALLOWED_ORIGIN": "https://nagisanzenin.github.io"
+    "ALLOWED_ORIGIN": "https://vuducdung1308.github.io"
   },
   "observability": {
     "enabled": true,

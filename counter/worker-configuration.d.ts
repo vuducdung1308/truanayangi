@@ -3,7 +3,7 @@
 interface __BaseEnv_Env {
 	DB: D1Database;
 	SPIN_RATE_LIMITER: RateLimit;
-	ALLOWED_ORIGIN: "https://nagisanzenin.github.io";
+	ALLOWED_ORIGIN: "https://vuducdung1308.github.io";
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
