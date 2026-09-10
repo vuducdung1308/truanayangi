@@ -1,5 +1,13 @@
 # Global spin counter
 
+**The deployed site currently uses a keyless third-party counter (Abacus,
+`abacus.jasoncameron.dev`) configured in `public-config.json` — no backend to
+run.** The Cloudflare Worker below is the optional self-hosted alternative: more
+robust (edge cache, per-IP rate limit, atomic D1 writes) but needs a Cloudflare
+account. To switch to it, follow *Deploy* and set `public-config.json` `apiUrl`
+to the Worker's `…/spins` URL; `hooks/use-global-spin-count.ts` would then need
+its GET-based `/hit` call swapped back to the `POST {id}` contract.
+
 Standalone Cloudflare Worker + D1. The public frontend stays on GitHub Pages;
 this backend has no Sites or OpenAI service dependency.
 
