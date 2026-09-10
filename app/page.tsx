@@ -67,13 +67,13 @@ function CaseTile(){return <div className="case-tile" role="img" aria-label="Hò
   <rect className="crate-glow" x="20" y="46" width="120" height="98" rx="7"/>
   <rect x="24" y="50" width="112" height="90" rx="5" fill="url(#crateBody)" stroke="#ffffff2e"/>
   <path d="M24 78h112" stroke="#ffffff22" strokeWidth="2"/>
-  <path d="M24 66V56a6 6 0 0 1 6-6h9M136 66V56a6 6 0 0 0-6-6h-9M24 124v10a6 6 0 0 0 6 6h9M136 124v10a6 6 0 0 1-6 6h-9" fill="none" stroke="#cfe08b" strokeWidth="3"/>
-  <rect x="70" y="50" width="20" height="90" fill="#d2f65b" opacity=".9"/>
-  <rect x="24" y="81" width="112" height="18" fill="#d2f65b" opacity=".9"/>
-  <path d="M80 68 101 89 80 110 59 89Z" fill="#1b2a10" stroke="#eaffa6" strokeWidth="2"/>
-  <text x="80" y="99" textAnchor="middle" fontSize="28" fontWeight="800" fill="#d2f65b">?</text>
-  <path d="M80 50c-7-13-27-12-25 1 1 8 17 6 25-1Zm0 0c7-13 27-12 25 1-1 8-17 6-25-1Z" fill="#d2f65b"/>
-  <circle cx="80" cy="48" r="5" fill="#eaffa6"/>
+  <path d="M24 66V56a6 6 0 0 1 6-6h9M136 66V56a6 6 0 0 0-6-6h-9M24 124v10a6 6 0 0 0 6 6h9M136 124v10a6 6 0 0 1-6 6h-9" fill="none" stroke="#ffb185" strokeWidth="3"/>
+  <rect x="70" y="50" width="20" height="90" fill="#f26522" opacity=".9"/>
+  <rect x="24" y="81" width="112" height="18" fill="#f26522" opacity=".9"/>
+  <path d="M80 68 101 89 80 110 59 89Z" fill="#3a1808" stroke="#ffd6c2" strokeWidth="2"/>
+  <text x="80" y="99" textAnchor="middle" fontSize="28" fontWeight="800" fill="#f26522">?</text>
+  <path d="M80 50c-7-13-27-12-25 1 1 8 17 6 25-1Zm0 0c7-13 27-12 25 1-1 8-17 6-25-1Z" fill="#f26522"/>
+  <circle cx="80" cy="48" r="5" fill="#ffd6c2"/>
  </svg>
  <span className="case-shine" aria-hidden="true"/>
 </div>}
