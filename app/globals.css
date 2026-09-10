@@ -193,3 +193,4 @@ html{scrollbar-gutter:stable}.reel-window{overflow:clip}.reel-track{transform:tr
 
 /* "You picked this before" note in the result dialog (local per-browser history). */
 .winner-history{margin:8px 0 0;font-size:13px;line-height:1.5;color:#d8c07a;text-align:center;font-variant-numeric:tabular-nums;max-width:min(520px,86vw)}
+.price-asof{opacity:.6;font-size:.85em;white-space:nowrap}

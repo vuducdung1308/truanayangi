@@ -20,9 +20,9 @@ try{
  let previous=[0,0,0,0];for(let m=30;m<=180;m++){const s=createFoodSelector(foods,m);const tails=[1,2,3,4].map(t=>foods.filter(f=>f.rarity>=t).reduce((a,f)=>a+s.probabilities.get(f),0));tails.forEach((x,i)=>assert.ok(x>=previous[i]-1e-12));previous=tails}
  // Catalog duplicates at an existing price must not alter price-group masses.
  for(const m of [50,150]){const a=createFoodSelector(foods,m),extra=[...foods,...Array.from({length:10},()=>({...foods[0]}))],b=createFoodSelector(extra,m);for(const price of new Set(foods.map(f=>f.price))){const sum=(items,s)=>items.filter(f=>f.price===price).reduce((v,f)=>v+s.probabilities.get(f),0);assert.ok(Math.abs(sum(foods,a)-sum(extra,b))<1e-12)}}
- const s=createFoodSelector(foods);assert.throws(()=>s.choose([]));assert.throws(()=>s.choose([{price:50,rarity:1}]));assert.throws(()=>s.choose(foods,()=>1));assert.throws(()=>createFoodSelector([],50));for(const m of [0,NaN,Infinity,24,261])assert.throws(()=>createFoodSelector(foods,m));
+ const s=createFoodSelector(foods);assert.throws(()=>s.choose([]));assert.throws(()=>s.choose([{price:50,rarity:1}]));assert.throws(()=>s.choose(foods,()=>1));assert.throws(()=>createFoodSelector([],50));for(const m of [0,NaN,Infinity,29,251])assert.throws(()=>createFoodSelector(foods,m));
  const equal=[{price:50,rarity:0},{price:50,rarity:4}];assert.deepEqual([...createFoodSelector(equal).probabilities.values()],[.5,.5]);
- for(const m of [25,260]){const s=createFoodSelector(foods,m);assert.ok(Math.abs(s.expectedPrice-m)<1e-9);assert.equal(s.choose(foods,rng).price,m)}
+ for(const m of [30,250]){const s=createFoodSelector(foods,m);assert.ok(Math.abs(s.expectedPrice-m)<1e-9);assert.equal(s.choose(foods,rng).price,m)}
  const veg=foods.filter(f=>f.veg),v=createFoodSelector(foods,150);assert.ok(Math.max(...veg.map(f=>v.probabilities.get(f)/veg.reduce((a,x)=>a+v.probabilities.get(x),0)))<.8);
  console.log(JSON.stringify(rows,null,2));console.log('PASS: means, spread, 700k draws, tier monotonicity, duplicate neutrality, vegetarian conditioning, edge cases');
 }finally{rmSync(out,{recursive:true,force:true})}

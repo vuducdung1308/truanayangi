@@ -16,25 +16,27 @@ Solve theta numerically so sum(p_i*c_i)=M. The log-price width is a product desi
 
 Equal prior weight per distinct price prevents adding variants at an existing price from increasing its total mass. Within a price group all meals have equal probability. A newly introduced price can still change the distribution; this does not claim to neutralize every possible catalog taxonomy change.
 
-The derivative of expected cost with respect to theta is Cov(c,ln(c/50))>0 for unequal prices, so the interior solution is unique. Fixed upper price-tail probabilities are nondecreasing as theta and M increase. An intermediate tier can rise then fall. Log-sum-exp normalization avoids overflow; endpoint means are handled explicitly. The UI keeps targets away from catalog endpoints (25/260k) to avoid forced single-price outcomes.
+The derivative of expected cost with respect to theta is Cov(c,ln(c/50))>0 for unequal prices, so the interior solution is unique. Fixed upper price-tail probabilities are nondecreasing as theta and M increase. An intermediate tier can rise then fall. Log-sum-exp normalization avoids overflow; endpoint means are handled explicitly. The catalog price range after the 2026-09 re-audit is 30–250k; a target at 30k forces the cheapest tier.
 
 Selector calculation is memoized on the selected mean, outside the open-click and animation paths. Reel filler conditions the same probabilities on recent-food exclusions, but never determines the independently selected winner.
 
 ## Current pool measurements
 
+Recomputed after the 2026-09 price re-audit (sigma .2):
+
 | Mean k | Blue % | Purple % | Pink % | Red % | Gold % | Within ±30% of mean |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 35 | 87.419 | 12.565 | .017 | 0 | 0 | 96.1% |
-| 50 | 23.329 | 71.605 | 5.063 | .004 | 0 | 94.8% |
-| 75 | .240 | 32.207 | 64.441 | 3.044 | .067 | 89.4% |
-| 100 | .001 | 2.613 | 60.027 | 33.331 | 4.029 | 93.4% |
-| 150 | 0 | .002 | 3.071 | 31.997 | 64.931 | 92.7% |
+| 35 | 85.708 | 14.275 | .017 | 0 | 0 | 95.6% |
+| 50 | 21.065 | 74.526 | 4.407 | .002 | 0 | 93.1% |
+| 75 | .211 | 31.985 | 64.898 | 2.837 | .069 | 89.6% |
+| 100 | .001 | 2.346 | 61.033 | 31.655 | 4.966 | 92.7% |
+| 150 | 0 | .005 | 4.826 | 29.778 | 65.390 | 86.4% |
 
 These are computed from the catalog's approximate prices, not measured purchase rates. They replace the earlier mean-only maximum-entropy plots. The old 51k + fixed .7% gold selector is no longer used.
 
 ## Vegetarian filter
 
-Condition the full-pool distribution on vegetarian meals: p(i|veg)=p_i/sum_veg(p). Do not refit eight vegetarian choices to an exact 150k mean, which would force falafel every time. The UI explicitly shows the filtered expected price (~37k for the 50k setting, ~127k for 150k). Thus the displayed general spending preference remains the user's input while the filtered mean can differ. No hidden hard price cap applies.
+Condition the full-pool distribution on vegetarian meals: p(i|veg)=p_i/sum_veg(p). Do not refit eight vegetarian choices to an exact 150k mean, which would force falafel every time. The UI explicitly shows the filtered expected price (~41k for the 50k setting, ~127k for 150k). Thus the displayed general spending preference remains the user's input while the filtered mean can differ. No hidden hard price cap applies.
 
 ## Validation
 
