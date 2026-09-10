@@ -7,7 +7,7 @@ export const TICK_SECONDS = [0,.063,.125,.188,.250,.313,.375,.438,.500,.563,.625
 // documented endpoint assumptions. This is a proxy, not an office-only mean.
 export const TARGET_LUNCH_PRICE = 50;
 // Product choice: spread in log-price space, not measured diner behavior.
-export const LOG_PRICE_SPREAD = .35;
+export const LOG_PRICE_SPREAD = .2;
 export function caseEase(progress:number){const p=Math.max(0,Math.min(1,progress));let lo=0,hi=1;for(let i=0;i<30;i++){const t=(lo+hi)/2,u=1-t,x=3*u*u*t*.075+3*u*t*t*.165+t*t*t;if(x<p)lo=t;else hi=t}const t=(lo+hi)/2,u=1-t;return 3*u*u*t*.82+3*u*t*t+t*t*t}
 type PricedMeal={price:number;rarity:number};
 export function createFoodSelector<T extends PricedMeal>(population:T[],target=TARGET_LUNCH_PRICE){

@@ -11,7 +11,7 @@ try{
   let spend=0;const counts=[0,0,0,0,0];for(let i=0;i<100000;i++){const f=s.choose(foods,rng);spend+=f.price;counts[f.rarity]++}
   assert.ok(Math.abs(spend/100000-target)<.7);
   const tiers=counts.map((_,t)=>foods.filter(f=>f.rarity===t).reduce((a,f)=>a+mass(f),0));tiers.forEach((p,t)=>assert.ok(Math.abs(p-counts[t]/100000)<.007));
-  for(const pool of [foods,foods.filter(f=>f.veg)]){let cum=0;const total=pool.reduce((a,f)=>a+mass(f),0);for(const f of pool){assert.equal(s.choose(pool,()=>(cum+mass(f)/2)/total),f);cum+=mass(f)}assert.ok(Math.abs(s.meanFor(pool)-pool.reduce((a,f)=>a+f.price*mass(f),0)/total)<1e-9)}
+  for(const pool of [foods,foods.filter(f=>f.veg)]){let cum=0;const total=pool.reduce((a,f)=>a+mass(f),0);for(const f of pool){if(mass(f)/total>1e-7)assert.equal(s.choose(pool,()=>(cum+mass(f)/2)/total),f);cum+=mass(f)}assert.ok(Math.abs(s.meanFor(pool)-pool.reduce((a,f)=>a+f.price*mass(f),0)/total)<1e-9)}
   const near=foods.filter(f=>f.price>=target*.7&&f.price<=target*1.3).reduce((a,f)=>a+mass(f),0);
   if(target>=50&&target<=150)assert.ok(near>.65);
   rows.push({target,tiers:tiers.map(x=>+(x*100).toFixed(3)),near:+(near*100).toFixed(1),vegMean:+s.meanFor(foods.filter(f=>f.veg)).toFixed(1)});

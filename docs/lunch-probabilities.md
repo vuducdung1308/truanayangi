@@ -8,7 +8,7 @@ Fixed boundaries: blue <=40k, purple (40,65], pink (65,100], red (100,130], gold
 
 ## Distribution
 
-Let x_i=ln(c_i/50), n(c_i)=number of catalog meals with that exact price, and sigma=.35. Use
+Let x_i=ln(c_i/50), n(c_i)=number of catalog meals with that exact price, and sigma=.2 (log-price width ~±20% around the selected spend). Use
 
 p_i(theta) = exp(-x_i²/(2 sigma²) + theta*x_i) / n(c_i) / Z(theta).
 
@@ -24,17 +24,17 @@ Selector calculation is memoized on the selected mean, outside the open-click an
 
 | Mean k | Blue % | Purple % | Pink % | Red % | Gold % | Within ±30% of mean |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| 35 | 79.707 | 19.297 | .986 | .009 | <.001 | 88.7% |
-| 50 | 36.713 | 50.092 | 12.570 | .581 | .044 | 80.2% |
-| 75 | 5.622 | 37.553 | 45.198 | 9.625 | 2.001 | 66.7% |
-| 100 | .634 | 13.283 | 47.134 | 26.717 | 12.231 | 73.9% |
-| 150 | .006 | .764 | 13.826 | 29.424 | 55.980 | 72.0% |
+| 35 | 87.419 | 12.565 | .017 | 0 | 0 | 96.1% |
+| 50 | 23.329 | 71.605 | 5.063 | .004 | 0 | 94.8% |
+| 75 | .240 | 32.207 | 64.441 | 3.044 | .067 | 89.4% |
+| 100 | .001 | 2.613 | 60.027 | 33.331 | 4.029 | 93.4% |
+| 150 | 0 | .002 | 3.071 | 31.997 | 64.931 | 92.7% |
 
 These are computed from the catalog's approximate prices, not measured purchase rates. They replace the earlier mean-only maximum-entropy plots. The old 51k + fixed .7% gold selector is no longer used.
 
 ## Vegetarian filter
 
-Condition the full-pool distribution on vegetarian meals: p(i|veg)=p_i/sum_veg(p). Do not refit eight vegetarian choices to an exact 150k mean, which would force falafel every time. The UI explicitly shows the filtered expected price (~35k for the 50k setting, ~124k for 150k). Thus the displayed general spending preference remains the user's input while the filtered mean can differ. No hidden hard price cap applies.
+Condition the full-pool distribution on vegetarian meals: p(i|veg)=p_i/sum_veg(p). Do not refit eight vegetarian choices to an exact 150k mean, which would force falafel every time. The UI explicitly shows the filtered expected price (~37k for the 50k setting, ~127k for 150k). Thus the displayed general spending preference remains the user's input while the filtered mean can differ. No hidden hard price cap applies.
 
 ## Validation
 
