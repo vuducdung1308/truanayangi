@@ -63,17 +63,17 @@ function MysteryArt(){return <div className="mystery-art" role="img" aria-label=
 </div>}
 function CaseTile(){return <div className="case-tile" role="img" aria-label="Hòm quà bí ẩn">
  <svg viewBox="0 0 160 160" aria-hidden="true">
-  <defs><linearGradient id="crateBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#38434f"/><stop offset="1" stopColor="#1b232b"/></linearGradient></defs>
+  <defs><linearGradient id="crateBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#3a1218"/><stop offset="1" stopColor="#1a070c"/></linearGradient></defs>
   <rect className="crate-glow" x="20" y="46" width="120" height="98" rx="7"/>
   <rect x="24" y="50" width="112" height="90" rx="5" fill="url(#crateBody)" stroke="#ffffff2e"/>
   <path d="M24 78h112" stroke="#ffffff22" strokeWidth="2"/>
-  <path d="M24 66V56a6 6 0 0 1 6-6h9M136 66V56a6 6 0 0 0-6-6h-9M24 124v10a6 6 0 0 0 6 6h9M136 124v10a6 6 0 0 1-6 6h-9" fill="none" stroke="#ffb185" strokeWidth="3"/>
-  <rect x="70" y="50" width="20" height="90" fill="#f26522" opacity=".9"/>
-  <rect x="24" y="81" width="112" height="18" fill="#f26522" opacity=".9"/>
-  <path d="M80 68 101 89 80 110 59 89Z" fill="#3a1808" stroke="#ffd6c2" strokeWidth="2"/>
-  <text x="80" y="99" textAnchor="middle" fontSize="28" fontWeight="800" fill="#f26522">?</text>
-  <path d="M80 50c-7-13-27-12-25 1 1 8 17 6 25-1Zm0 0c7-13 27-12 25 1-1 8-17 6-25-1Z" fill="#f26522"/>
-  <circle cx="80" cy="48" r="5" fill="#ffd6c2"/>
+  <path d="M24 66V56a6 6 0 0 1 6-6h9M136 66V56a6 6 0 0 0-6-6h-9M24 124v10a6 6 0 0 0 6 6h9M136 124v10a6 6 0 0 1-6 6h-9" fill="none" stroke="#e6c67d" strokeWidth="3"/>
+  <rect x="70" y="50" width="20" height="90" fill="#c9a04a" opacity=".9"/>
+  <rect x="24" y="81" width="112" height="18" fill="#c9a04a" opacity=".9"/>
+  <path d="M80 68 101 89 80 110 59 89Z" fill="#2a0810" stroke="#f2dcaa" strokeWidth="2"/>
+  <text x="80" y="99" textAnchor="middle" fontSize="28" fontWeight="800" fill="#c9a04a">?</text>
+  <path d="M80 50c-7-13-27-12-25 1 1 8 17 6 25-1Zm0 0c7-13 27-12 25 1-1 8-17 6-25-1Z" fill="#c9a04a"/>
+  <circle cx="80" cy="48" r="5" fill="#f2dcaa"/>
  </svg>
  <span className="case-shine" aria-hidden="true"/>
 </div>}
@@ -191,6 +191,6 @@ export default function Home(){
 
  <section className="inventory"><div className="section-heading"><div><span className="eyebrow">TRONG HÒM CÓ GÌ?</span><h2>Vật phẩm trong hòm <span>{eligible.length.toString().padStart(2,'0')}</span></h2></div><div className="rarity-legend">{tiers.map((t,i)=><span key={t}><i style={{background:colors[i]}}/>{t}</span>)}</div></div><div className="inventory-grid">{inventoryCards}</div></section>
 
- <footer><span>truanayangi.</span><span>Fan-made · SFX: Valve / <a href="https://github.com/sourcesounds/csgo" target="_blank" rel="noreferrer">SourceSounds</a></span></footer>
+ <footer><span>@VuDuDu</span><span>Fan-made · SFX: Valve / <a href="https://github.com/sourcesounds/csgo" target="_blank" rel="noreferrer">SourceSounds</a></span></footer>
  </main></div>
 }
